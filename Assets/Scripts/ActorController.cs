@@ -18,64 +18,9 @@ public class ActorController : MonoBehaviour {
 		Count
 	};
 
+	public CharacterControlAsset characterControlAsset;
+
 	// ----------------------------------
-	[SerializeField]
-	private float m_moveSpeed;
-
-	[SerializeField]
-	private uint m_maxStandJumpFrames = 12;
-
-	[SerializeField]
-	private uint m_maxRunJumpFrames = 16;
-
-	[SerializeField]
-	private float m_jumpForce = 0;
-
-	[SerializeField]
-	private float m_doubleJumpForce = 0;
-
-	[SerializeField]
-	private float m_wallJumpForce = 19;
-
-	[SerializeField]
-	private float m_hangJumpForce = 0;
-
-	[SerializeField]
-	private float m_maxFallSpeed = 16.0f;
-
-	[SerializeField]
-	private float m_wallFriction = 0.5f;
-
-	[SerializeField]
-	private float m_maxWallSlideSpeed = 4.0f;
-
-	[SerializeField]
-	private float m_pushMoveForce = 0.1f;
-
-	[SerializeField]
-	private float m_groundMoveForce = 0.05f;
-
-	[SerializeField]
-	private float m_groundTurnForce = 0.2f;
-
-	[SerializeField]
-	private float m_groundStopForce = 0.1f;
-
-	[SerializeField]
-	private float m_airMoveForce = 0.015f;
-
-	[SerializeField]
-	private float m_airTurnForce = 0.1f;
-
-	[SerializeField]
-	private float m_airStopForce = 0.02f;
-
-	[SerializeField]
-	private float m_wallJumpMoveForce = 0.05f;
-
-	[SerializeField]
-	private float m_wallJumpStopForce = 0.02f;
-
 	[SerializeField]
 	private Transform[] m_grabLocations;
 
@@ -121,19 +66,19 @@ public class ActorController : MonoBehaviour {
 
 	// Serialized
 	public float jumpForce {
-		get { return m_jumpForce; }
+		get { return characterControlAsset.jumpForce; }
 	}
 
 	public float doubleJumpForce {
-		get { return m_doubleJumpForce; }
+		get { return characterControlAsset.doubleJumpForce; }
 	}
 
 	public float hangJumpForce {
-		get { return m_hangJumpForce; }
+		get { return characterControlAsset.hangJumpForce; }
 	}
 
 	public float wallJumpForce {
-		get { return m_wallJumpForce; }
+		get { return characterControlAsset.wallJumpForce; }
 	}
 		
 	public bool isFacingRight {
@@ -149,47 +94,47 @@ public class ActorController : MonoBehaviour {
 	}
 
 	public float walkAcceleration {
-		get { return m_groundMoveForce; }
+		get { return characterControlAsset.groundMoveForce; }
 	}
 
 	public float turnAcceleration {
-		get { return m_groundTurnForce; }
+		get { return characterControlAsset.groundTurnForce; }
 	}
 
 	public float stopDeceralartion {
-		get { return m_groundStopForce; }
+		get { return characterControlAsset.groundStopForce; }
 	}
 
 	public float airAcceleration {
-		get { return m_airMoveForce; }
+		get { return characterControlAsset.airMoveForce; }
 	}
 
 	public float turnAirAcceleration {
-		get { return m_airTurnForce; }
+		get { return characterControlAsset.airTurnForce; }
 	}
 
 	public float airDeceralartion {
-		get { return m_airStopForce; }
+		get { return characterControlAsset.airStopForce; }
 	}
 
 	public float walllAirAcceleration {
-		get { return m_wallJumpMoveForce; }
+		get { return characterControlAsset.wallJumpMoveForce; }
 	}
 
 	public float walllAirDecceleration {
-		get { return m_wallJumpStopForce; }
+		get { return characterControlAsset.wallJumpStopForce; }
 	}
 
 	public float wallFriction {
-		get { return m_wallFriction; }
+		get { return characterControlAsset.wallFriction; }
 	}
 
 	public float maxWallSlideSpeed {
-		get { return m_maxWallSlideSpeed; }
+		get { return characterControlAsset.maxWallSlideSpeed; }
 	}
 
 	public float moveSpeed {
-		get { return m_moveSpeed; }
+		get { return characterControlAsset.moveSpeed; }
 	}
 		
 	// External access
@@ -289,7 +234,7 @@ public class ActorController : MonoBehaviour {
 		} else if (m_jumpHeldTime == 0) {
 			m_jumpHeldTime = 1;
 
-			m_maxJumpFrames = (Mathf.Abs (lateralSpeed) >= 0.3f) ? m_maxRunJumpFrames : m_maxStandJumpFrames;
+			m_maxJumpFrames = (Mathf.Abs (lateralSpeed) >= 0.3f) ? characterControlAsset.maxRunJumpFrames : characterControlAsset.maxStandJumpFrames;
 				
 			// Jump tapped
 			m_currentActorState.Jump ();
@@ -444,11 +389,11 @@ public class ActorController : MonoBehaviour {
 
 		// Clamp delta
 		if (m_rigidBody.hitWall) {
-			m_lateralSpeed = Mathf.Clamp (m_lateralSpeed, -m_pushMoveForce, m_pushMoveForce);
+			m_lateralSpeed = Mathf.Clamp (m_lateralSpeed, -characterControlAsset.pushMoveForce, characterControlAsset.pushMoveForce);
 		}
 			
 		// Clamp fall speed
-		velocity.y = Mathf.Max (velocity.y, -m_maxFallSpeed * timeDelta);
+		velocity.y = Mathf.Max (velocity.y, -characterControlAsset.maxFallSpeed * timeDelta);
 
 		// Attempt wall grab
 		if (velocity.y <= 0) {

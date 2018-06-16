@@ -212,25 +212,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2b8eaecd69da640e193dd1624b5dbb9a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_moveSpeed: 10
-  m_maxStandJumpFrames: 10
-  m_maxRunJumpFrames: 16
-  m_jumpForce: 14
-  m_doubleJumpForce: 16
-  m_wallJumpForce: 19
-  m_hangJumpForce: 16
-  m_maxFallSpeed: 20
-  m_wallFriction: 0.1
-  m_maxWallSlideSpeed: 8
-  m_pushMoveForce: 0.1
-  m_groundMoveForce: 0.05
-  m_groundTurnForce: 0.15
-  m_groundStopForce: 0.1
-  m_airMoveForce: 0.05
-  m_airTurnForce: 0.15
-  m_airStopForce: 0.1
-  m_wallJumpMoveForce: 0.05
-  m_wallJumpStopForce: 0.02
+  characterControlAsset: {fileID: 11400000, guid: 79fdbeed777f143a9a9b3934d5d978ef,
+    type: 2}
   m_grabLocations:
   - {fileID: 4754069344788448}
   - {fileID: 4024037136559564}
