@@ -51,4 +51,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5854fd778b5b34346bf3997b99c4d31e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  entrySceneName: boot
+  entrySceneName: Sandbox

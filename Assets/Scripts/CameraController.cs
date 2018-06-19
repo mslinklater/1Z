@@ -17,12 +17,15 @@ public class CameraController : MonoBehaviour {
 	float m_cameraHeight;
 
 	// Use this for initialization
-	void Start () {
+	void Start () 
+	{
 		transform.position = new Vector3 (m_playerActor.transform.position.x, m_playerActor.transform.position.y, transform.position.z);
 	}
 
-	static Vector2 ClampToWindow(Vector2 input, Vector2 window) {
+	static Vector2 ClampToWindow(Vector2 input, Vector2 window) 
+	{
 		Vector2 output = new Vector2();
+
 		if (input.x > window.x)
 			output.x = input.x - window.x;
 		else if (input.x < -window.x)
@@ -41,11 +44,13 @@ public class CameraController : MonoBehaviour {
 	}
 
 	// Update is called once per frame
-	void FixedUpdate () {
-		float deltaTime = Time.fixedDeltaTime;;
+	void FixedUpdate () 
+	{
+		float deltaTime = Time.fixedDeltaTime;
 
 		Vector2 target = m_playerActor.transform.position;
-		if (m_playerActor.isInGroundState || m_playerActor.isWallSlide || target.y > m_playerActor.transform.position.y) {
+		if (m_playerActor.isInGroundState || m_playerActor.isWallSlide || target.y > m_playerActor.transform.position.y) 
+		{
 			m_cameraHeight = m_playerActor.transform.position.y;
 		}
 

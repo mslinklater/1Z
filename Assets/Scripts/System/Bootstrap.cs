@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using System.Collections;
 using System.Collections.Generic;
 
@@ -44,7 +45,7 @@ namespace MSL
                     if(entrySceneName != "")
                     {
                         // TODO: Need check for valid scene name here
-                        Application.LoadLevel(entrySceneName);
+                        SceneManager.LoadScene(entrySceneName);
                     }
                 }
             }

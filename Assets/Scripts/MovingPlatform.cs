@@ -21,7 +21,8 @@ public class MovingPlatform : MonoBehaviour {
 	private BoxCollider2D m_collider;
 
 	// Use this for initialization
-	void Start () {
+	void Start () 
+	{
 		m_collider = GetComponent<BoxCollider2D> ();
 
 		m_size.x = m_collider.bounds.size.x;
@@ -30,43 +31,55 @@ public class MovingPlatform : MonoBehaviour {
 
 		m_oneWay = false;
 		CollisionCreator collisionCreator = GetComponent<CollisionCreator> ();
-		if (collisionCreator != null) {
+
+		if (collisionCreator != null) 
+		{
 			m_oneWay = collisionCreator.isOneway;
 		}
 
 		// Remove children
-		foreach(Transform location in m_locations) {
-			if(location.parent == transform) {
+		foreach(Transform location in m_locations) 
+		{
+			if(location.parent == transform) 
+			{
 				location.SetParent(null);
 			}
 		}
 	}
 	
 	// Update is called once per frame
-	void FixedUpdate () {
+	void FixedUpdate () 
+	{
 		float deltaTime = Time.fixedDeltaTime;
 
-		if (m_locations.Length <= 1) {
+		if (m_locations.Length <= 1) 
+		{
 			return;
 		}
 
 		m_time += deltaTime * m_speed / m_locations.Length;
 
-		while(m_time >= 1.0f) {
+		while(m_time >= 1.0f) 
+		{
 			m_time -= 1.0f;
 			index++;
-			if(index == m_locations.Length) {
+			if(index == m_locations.Length) 
+			{
 				index = 0;
 			}
 		}
 
 		uint next = index + 1;
-		if (next == m_locations.Length) {
+
+		if (next == m_locations.Length) 
+		{
 			next = 0;
 		}
 
 		float time;
-		switch (m_interpolation) {
+
+		switch (m_interpolation) 
+		{
 		case EInterpotionType.Cubic:
 			time = EaseInOutCubic (m_time);
 			break;
@@ -84,33 +97,13 @@ public class MovingPlatform : MonoBehaviour {
 		Vector2 localVelocity = newPosition - position;
 		
 		RaycastHit2D hit2D = Physics2D.BoxCast(collisionPos, m_size, 0, localVelocity.normalized, localVelocity.magnitude + 0.01f);
-		if (hit2D && hit2D.transform.parent != transform && (!m_oneWay || localVelocity.y >= 0)) {
+
+		if (hit2D && hit2D.transform.parent != transform && (!m_oneWay || localVelocity.y >= 0)) 
+		{
 			Vector3 newPos = localVelocity;// - (hit2D.normal * 0.01f);
 			hit2D.transform.position += newPos;
 			// Debug.Log(Time.frameCount + "push" + hit2D.transform.name);
 		} 
-
-		/*
-		m_position = transform.position;
-
-		Vector2 newPosition = m_position;
-		float offset = m_distance * Mathf.Cos (time);
-
-		if(m_isVertical) {
-			newPosition.y = m_origin.y + offset;
-		} else { 
-			newPosition.x = m_origin.x + offset;
-		}
-
-		Vector2 collisionPos = m_position + m_offset;
-		Vector2 localVelocity = newPosition - m_position;
-
-		RaycastHit2D hit2D = Physics2D.BoxCast(collisionPos, m_size, 0, localVelocity.normalized, localVelocity.magnitude + 0.01f);
-		if (hit2D && hit2D.transform.parent != transform && (!m_oneWay || localVelocity.y >= 0)) {
-			Vector3 newPos = localVelocity;// - (hit2D.normal * 0.01f);
-				hit2D.transform.position += newPos;
-		} 
-		*/
 
 		transform.position = newPosition;
 		
@@ -141,7 +134,8 @@ public class MovingPlatform : MonoBehaviour {
 		return c/2.0f*(t*t*t + 2.0f) + from;
 	}
 
-	void DebugDraw() {
+	void DebugDraw() 
+	{
 		Vector2 pos = new Vector2 ();
 		
 		pos = m_offset;
@@ -150,10 +144,10 @@ public class MovingPlatform : MonoBehaviour {
 		
 		float sx = m_size.x * 0.5f;
 		float sy = m_size.y * 0.5f;
+
 		Debug.DrawLine (pos + new Vector2 (-sx, -sy), pos + new Vector2 (sx, -sy));
 		Debug.DrawLine (pos + new Vector2 (-sx, sy), pos + new Vector2 (sx, sy));
 		Debug.DrawLine (pos + new Vector2 (-sx, -sy), pos + new Vector2 (-sx, sy));
 		Debug.DrawLine (pos + new Vector2 (sx, -sy), pos + new Vector2 (sx, sy));
 	}
-
 }

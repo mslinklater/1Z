@@ -1,7 +1,8 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class ActorController : MonoBehaviour {
+public class ActorController : MonoBehaviour 
+{
 	public enum State
 	{
 		None,
@@ -42,100 +43,34 @@ public class ActorController : MonoBehaviour {
 	private ActorState m_currentActorState = null;
 	private ActorState[] m_ActorStateTable;
 
-	// ----------------------------------
-	// States
-	public bool isInGroundState {
-		get { return m_currentState == State.Stand || m_currentState == State.Attack || m_currentState == State.Walk; }
-	}
+#region States
 
-	public bool isJumpingState {
-		get { return m_currentState == State.Jump || m_currentState == State.HangJump; }
-	}
+	public bool isInGroundState { get { return m_currentState == State.Stand || m_currentState == State.Attack || m_currentState == State.Walk; }}
+	public bool isJumpingState { get { return m_currentState == State.Jump || m_currentState == State.HangJump; }}
+	public bool isLedgeGrab { get { return m_currentState == State.LedgeGrab; }}
+	public bool isWallSlide { get { return m_currentState == State.WallSlide; }}
+	public bool isAttacking { get { return m_currentState == State.Attack; }}
 
-	public bool isLedgeGrab {
-		get { return m_currentState == State.LedgeGrab; }
-	}
-		
-	public bool isWallSlide {
-		get { return m_currentState == State.WallSlide; }
-	}
+#endregion
 
-	public bool isAttacking {
-		get { return m_currentState == State.Attack; }
-	}
-
-	// Serialized
-	public float jumpForce {
-		get { return characterControlAsset.jumpForce; }
-	}
-
-	public float doubleJumpForce {
-		get { return characterControlAsset.doubleJumpForce; }
-	}
-
-	public float hangJumpForce {
-		get { return characterControlAsset.hangJumpForce; }
-	}
-
-	public float wallJumpForce {
-		get { return characterControlAsset.wallJumpForce; }
-	}
-		
-	public bool isFacingRight {
-		get { return m_isFacingRight; }
-	}
-		
-	public uint jumpHeldTime { 
-		get { return m_jumpHeldTime; }
-	}
-
-	public uint maxJumpFrames {
-		get { return m_maxJumpFrames; }
-	}
-
-	public float walkAcceleration {
-		get { return characterControlAsset.groundMoveForce; }
-	}
-
-	public float turnAcceleration {
-		get { return characterControlAsset.groundTurnForce; }
-	}
-
-	public float stopDeceralartion {
-		get { return characterControlAsset.groundStopForce; }
-	}
-
-	public float airAcceleration {
-		get { return characterControlAsset.airMoveForce; }
-	}
-
-	public float turnAirAcceleration {
-		get { return characterControlAsset.airTurnForce; }
-	}
-
-	public float airDeceralartion {
-		get { return characterControlAsset.airStopForce; }
-	}
-
-	public float walllAirAcceleration {
-		get { return characterControlAsset.wallJumpMoveForce; }
-	}
-
-	public float walllAirDecceleration {
-		get { return characterControlAsset.wallJumpStopForce; }
-	}
-
-	public float wallFriction {
-		get { return characterControlAsset.wallFriction; }
-	}
-
-	public float maxWallSlideSpeed {
-		get { return characterControlAsset.maxWallSlideSpeed; }
-	}
-
-	public float moveSpeed {
-		get { return characterControlAsset.moveSpeed; }
-	}
+	public float jumpForce { get { return characterControlAsset.jumpForce; }}
+	public float doubleJumpForce { get { return characterControlAsset.doubleJumpForce; }}
+	public float hangJumpForce { get { return characterControlAsset.hangJumpForce; }}
+	public float wallJumpForce { get { return characterControlAsset.wallJumpForce; }}
+	public bool isFacingRight { get { return m_isFacingRight; }}
+	public uint jumpHeldTime { get { return m_jumpHeldTime; }}
+	public uint maxJumpFrames { get { return m_maxJumpFrames; }}
+	public float walkAcceleration { get { return characterControlAsset.groundMoveForce; }}
+	public float turnAcceleration {	get { return characterControlAsset.groundTurnForce; }}
+	public float stopDeceralartion { get { return characterControlAsset.groundStopForce; }}
+	public float airAcceleration { get { return characterControlAsset.airMoveForce; }}
+	public float turnAirAcceleration { get { return characterControlAsset.airTurnForce; }}
+	public float airDeceralartion {	get { return characterControlAsset.airStopForce; }}
+	public float walllAirAcceleration {	get { return characterControlAsset.wallJumpMoveForce; }}
+	public float walllAirDecceleration { get { return characterControlAsset.wallJumpStopForce; }}
+	public float wallFriction {	get { return characterControlAsset.wallFriction; }}
+	public float maxWallSlideSpeed { get { return characterControlAsset.maxWallSlideSpeed; }}
+	public float moveSpeed { get { return characterControlAsset.moveSpeed; }}
 		
 	// External access
 	public int direction {
@@ -160,8 +95,10 @@ public class ActorController : MonoBehaviour {
 		return m_grabLocations[index];
 	}
 
-	// Use this for initialization
-	void Start () {
+#region MonoBehaviour
+
+	void Start () 
+	{
 		m_rigidBody = GetComponent<OneBody2D> ();
 		m_animator = GetComponent<Animator> ();
 
@@ -172,7 +109,9 @@ public class ActorController : MonoBehaviour {
 		if(m_animator == null)
 		{
 			Component[] components = transform.GetComponentsInChildren<Animator>();
-			if(components.Length > 0) {
+
+			if(components.Length > 0) 
+			{
 				m_animator = components[0] as Animator;
 			}
 		}
@@ -194,7 +133,91 @@ public class ActorController : MonoBehaviour {
 		Reset ();
 	}
 
-	void Reset() {
+	public void OnGUI()
+	{
+		if(Application.isEditor)
+		{
+			string stateString = string.Format("State - {0}", m_currentState);
+			GUI.Label(new Rect(10, 10, 200, 30), stateString);
+		}
+	}
+
+	public void Update() {
+		if (m_currentActorState == null) 
+		{
+			Start ();
+		}
+		
+		// Set animator
+		m_currentActorState.Update();
+
+		m_animator.SetBool ("air", !m_rigidBody.onGround);
+
+		m_animator.SetLayerWeight(1, (m_rigidBody.onGround && m_fallFrame == -1 ? 0.0f : 1.0f));
+	}
+
+	void FixedUpdate() 
+	{
+		if (m_currentActorState == null) 
+		{
+			Start ();
+		}
+
+		if (m_currentState == State.Jump)
+		{
+			if (m_rigidBody.onGround)
+			{
+				m_fallFrame = -1;
+				SetState(State.Stand);
+			}
+		}
+		else
+		{
+			if (m_rigidBody.onGround)
+			{
+				m_fallFrame = -1;
+
+				if (!isAttacking) 
+				{
+					SetState(State.Stand);
+				}
+			}
+			else if (isInGroundState)
+			{
+				if (m_fallFrame == -1)
+				{
+					m_fallFrame = Time.frameCount;
+				}
+				else 
+				{
+					// Debug.Log(Time.frameCount - m_fallFrame);
+					if (Time.frameCount - m_fallFrame > 2)
+					{
+						SetState(State.Fall);
+						m_animator.SetTrigger("jump"); // fall?
+					}
+				}
+			}
+		}
+
+		if (m_jumpHeld && m_jumpHeldTime < m_maxJumpFrames) 
+		{
+			m_jumpHeldTime ++;
+		} 
+		else 
+		{
+			if (isInGroundState && !m_jumpHeld) {
+				m_jumpHeldTime = 0;
+			}
+		}
+
+		UpdateMovement (m_lateralDirection);
+	}
+
+#endregion
+
+	void Reset() 
+	{
 		transform.SetParent (null);
 		transform.position = m_rigidBody.position;
 
@@ -219,19 +242,25 @@ public class ActorController : MonoBehaviour {
 		m_rigidBody.Reset();
 	}
 	
-	public void Attack() {
-		// Attack
-		if (!isAttacking && m_rigidBody.onGround) {
+	public void Attack() 
+	{
+		if (!isAttacking && m_rigidBody.onGround) 
+		{
 			SetState(State.Attack);
 		}
 	}
 
-	public void Jump(bool held) {
+	public void Jump(bool held) 
+	{
 		m_jumpHeld = held;
-		if (!m_jumpHeld) {
+
+		if (!m_jumpHeld) 
+		{
 			// Not down
 			m_jumpHeldTime = 0;
-		} else if (m_jumpHeldTime == 0) {
+		} 
+		else if (m_jumpHeldTime == 0) 
+		{
 			m_jumpHeldTime = 1;
 
 			m_maxJumpFrames = (Mathf.Abs (lateralSpeed) >= 0.3f) ? characterControlAsset.maxRunJumpFrames : characterControlAsset.maxStandJumpFrames;
@@ -241,71 +270,8 @@ public class ActorController : MonoBehaviour {
 		}
 	}
 
-
-	public void Update() {
-		if (m_currentActorState == null) {
-			Start ();
-		}
-		
-		// Set animator
-		m_currentActorState.Update();
-
-		m_animator.SetBool ("air", !m_rigidBody.onGround);
-
-		m_animator.SetLayerWeight(1, (m_rigidBody.onGround && m_fallFrame == -1 ? 0.0f : 1.0f));
-	}
-
-	void FixedUpdate() {
-		if (m_currentActorState == null) {
-			Start ();
-		}
-
-		if (m_currentState == State.Jump)
-		{
-			if (m_rigidBody.onGround)
-			{
-				m_fallFrame = -1;
-				SetState(State.Stand);
-			}
-		}
-		else
-		{
-			if (m_rigidBody.onGround)
-			{
-				m_fallFrame = -1;
-				if (!isAttacking) {
-					SetState(State.Stand);
-				}
-			}
-			else if (isInGroundState)
-			{
-				if (m_fallFrame == -1)
-				{
-					m_fallFrame = Time.frameCount;
-				}
-				else {
-					// Debug.Log(Time.frameCount - m_fallFrame);
-					if (Time.frameCount - m_fallFrame > 2)
-					{
-						SetState(State.Fall);
-						m_animator.SetTrigger("jump"); // fall?
-					}
-				}
-			}
-		}
-
-		if (m_jumpHeld && m_jumpHeldTime < m_maxJumpFrames) {
-			m_jumpHeldTime ++;
-		} else {
-			if (isInGroundState && !m_jumpHeld) {
-				m_jumpHeldTime = 0;
-			}
-		}
-
-		UpdateMovement (m_lateralDirection);
-	}
-
-	void UpdateMovement(int dir) {
+	void UpdateMovement(int dir) 
+	{
 		float timeDelta = Time.fixedDeltaTime * 60.0f;
 		if (timeDelta <= 0) { 
 			return;
@@ -316,20 +282,6 @@ public class ActorController : MonoBehaviour {
 			Reset();
 			return;
 		}
-		/*
-		if (dir == 0) {
-			m_walkDelta = Mathf.MoveTowards (m_walkDelta, 0.0f, m_stopDelta * timeDelta);
-		} else {
-			bool sameDir = (Mathf.Sign (m_walkDelta) == Mathf.Sign (dir)) || (dir == 0) || (m_walkDelta == 0);
-			if (isInGroundState) {
-				m_walkDelta = Mathf.MoveTowards (m_walkDelta, dir < 0 ? -1.0f : 1.0f, sameDir ? m_speedUpDelta * timeDelta : m_turnDelta * timeDelta);
-			} else {
-				float scaler = isJumpingState ? timeDelta : timeDelta * 0.5f;
-				m_walkDelta = Mathf.MoveTowards (m_walkDelta, dir < 0 ? -1.0f : 1.0f, sameDir ? m_speedUpDeltaAir * scaler : m_turnDeltaAir * scaler);
-			}
-		} 
-
-		*/
 
 		m_currentActorState.FixedUpdate ();
 
@@ -337,58 +289,13 @@ public class ActorController : MonoBehaviour {
 
 		m_currentActorState.UpdateVelocity (timeDelta, dir, ref velocity);
 
-		/*
-		if (!isAttacking) {
-			if (isInGroundState) {
-				velocity.x = (m_walkDelta * m_moveSpeed * timeDelta);
-			} else {
-				if (Mathf.Abs (m_walkDelta) > float.Epsilon) {
-					velocity.x += m_walkDelta * m_moveSpeed * timeDelta;
-				} else {
-					velocity.x = Mathf.MoveTowards (velocity.x, 0, 0.3f * timeDelta);
-				}
-				velocity.x = Mathf.Clamp (velocity.x, -m_moveSpeed, m_moveSpeed);
-			}
-
-			if ((m_walkDelta > 0 && !m_isFacingRight) || (m_walkDelta < 0 && m_isFacingRight)) {
-				Flip();
-			}
-		}
-*/
-		if (!isInGroundState) {
-			/*
-			if (isWallSlide)
-			{
-				m_wallSlideSpeed = Mathf.MoveTowards(m_wallSlideSpeed, m_maxFallSpeed, m_maxFallSpeed * timeDelta * (isWallSlide ? 0 : 0.1f));//m_maxFallSpeed * timeDelta * 0.1f); 
-				if (Mathf.Abs(velocity.x) > float.Epsilon && Mathf.Sign(velocity.x) == m_rigidBody.wallDirection)
-				{
-					SetState(State.Fall);
-				}
-				else if (isWallSlide && !m_rigidBody.hitWall && !isLedgeGrab)
-				{
-					SetState(State.Fall); // Todo - falling but allow wall jump
-					// Not great this - if you're not pushing AND drifted beyond a wall then you'd still be sliding
-					if (dir != 0)
-					{
-						// m_wallSlide = false;
-					}
-				}
-			}
-
-			if (!isLedgeGrab)
-			{
-				if (m_rigidBody.hitWall && Physics2D.OverlapCircle(m_grabLocations[1].position, 0.11f, m_solidMask) && m_rigidBody.velocity.y <= 0)
-				{
-					if (dir == -Mathf.Sign (m_rigidBody.wallDirection)) {
-						SetState(State.WallSlide);
-					}						
-				}
-			}
-						*/
+		if (!isInGroundState) 
+		{
 		}
 
 		// Clamp delta
-		if (m_rigidBody.hitWall) {
+		if (m_rigidBody.hitWall) 
+		{
 			m_lateralSpeed = Mathf.Clamp (m_lateralSpeed, -characterControlAsset.pushMoveForce, characterControlAsset.pushMoveForce);
 		}
 			
@@ -396,12 +303,18 @@ public class ActorController : MonoBehaviour {
 		velocity.y = Mathf.Max (velocity.y, -characterControlAsset.maxFallSpeed * timeDelta);
 
 		// Attempt wall grab
-		if (velocity.y <= 0) {
-			if (isWallSlide || isJumpingState) {
+		if (velocity.y <= 0) 
+		{
+			if (isWallSlide || isJumpingState) 
+			{
 				bool overlap = Physics2D.OverlapCircle (m_grabLocations[0].position, 0.0f, m_solidMask);
+
 				RaycastHit2D result = Physics2D.Raycast (m_grabLocations[0].position, Vector3.down, 0.05f + (m_rigidBody.velocity.y * -Time.deltaTime), m_solidMask);
-				if (!overlap && result.distance < 0.5) {
-					if (result) {
+
+				if (!overlap && result.distance < 0.5) 
+				{
+					if (result) 
+					{
 						velocity.y = -result.distance * 60;
 
 						SetState(State.LedgeGrab);
@@ -416,10 +329,10 @@ public class ActorController : MonoBehaviour {
 		m_rigidBody.velocity = velocity / timeDelta;
 	}
 
-	public void Flip() {
+	public void Flip() 
+	{
 		m_isFacingRight = !m_isFacingRight;
 		
-		// Flip
 		Vector3 localScale = transform.localScale;
 		localScale.x *= -1.0f;
 		transform.localScale = localScale;
